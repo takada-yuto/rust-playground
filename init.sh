@@ -21,6 +21,4 @@ cargo new api
 # Next.jsアプリケーションディレクトリに移動し、依存関係をインストール
 cd frontend && npm i
 
-cd .. && chown -R node:node .
-
 echo "Initialization complete!"

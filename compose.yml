@@ -5,7 +5,7 @@ services:
     build: .
     volumes:
       - .:/app
-      - ../.aws:/root/.aws
+      - ../.aws:/home/node/.aws
     ports:
       - 3000:3000
     tty: true

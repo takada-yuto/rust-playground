@@ -8,6 +8,8 @@ RUN apt-get update && apt-get install -y less vim curl unzip sudo \
   && rm awscliv2.zip \
   && npm install -g aws-cdk
 
+USER node
+
 # Install Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
 

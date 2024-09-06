@@ -5,7 +5,7 @@
     "backend": "bin/backend.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "rustup target add x86_64-unknown-linux-musl && cargo build --target=x86_64-unknown-linux-musl && mkdir -p ./target/cdk/release && cp ./target/x86_64-unknown-linux-musl/debug/bootstrap ./target/cdk/release/bootstrap",
     "watch": "tsc -w",
     "test": "jest",
     "cdk": "cdk"

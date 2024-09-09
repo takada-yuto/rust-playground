@@ -2,6 +2,7 @@ import useSWR from "swr"
 
 interface Env {
   lambdaFunctionURL: string | undefined
+  pythonLambdaFunctionURL: string | undefined
 }
 
 const fetcher = async () => {
@@ -19,6 +20,7 @@ export default function useEnv() {
     return {
       env: Object.freeze({
         lambdaFunctionURL: process.env.NEXT_PUBLIC_LAMBDA_FUNCTION_URL,
+        pythonLambdaFunctionURL: process.env.NEXT_PUBLIC_PYTHON_LAMBDA_FUNCTION_URL,
       }) as Env,
     }
   }

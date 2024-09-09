@@ -66,9 +66,12 @@ export class BackendStack extends cdk.Stack {
       runtime: Runtime.PROVIDED_AL2,
       handler: `${id}`, 
       code: Code.fromAsset("./target/cdk/release"),
-      timeout: cdk.Duration.seconds(10),
+      timeout: cdk.Duration.seconds(60),
       logRetention: cdk.aws_logs.RetentionDays.ONE_WEEK,
       tracing: Tracing.ACTIVE,
+      environment: {
+        CLOUDFRONT_URL: `https://${distribution.distributionDomainName}`
+      }
     });
 
     const lambdaFunctionURL =
@@ -76,16 +79,45 @@ export class BackendStack extends cdk.Stack {
         authType: cdk.aws_lambda.FunctionUrlAuthType.NONE,
       })
 
+    const pythonLambda = new Function(this, "PythonFunction", {
+      runtime: Runtime.PYTHON_3_11,
+      code: Code.fromAsset('python'),
+      handler: 'index.handler',
+      timeout: cdk.Duration.seconds(60),
+      logRetention: cdk.aws_logs.RetentionDays.ONE_WEEK,
+      tracing: Tracing.ACTIVE,
+      environment: {
+        CLOUDFRONT_URL: `https://${distribution.distributionDomainName}`
+      }
+    });
+
+    const pythonLambdaFunctionURL =
+      pythonLambda.addFunctionUrl({
+        authType: cdk.aws_lambda.FunctionUrlAuthType.NONE,
+      })
+
 
     new BucketDeployment(this, "RustPlaygroundBucketDeployment", {
       sources: [
         Source.asset("../frontend/out"),
-        Source.jsonData("env.json", { lambdaFunctionURL: lambdaFunctionURL.url }),
+        Source.jsonData("env.json", { lambdaFunctionURL: lambdaFunctionURL.url, pythonLambdaFunctionURL: pythonLambdaFunctionURL.url }),
       ],
       destinationBucket: rustPlaygroundBucket,
       distribution: distribution,
       distributionPaths: ["/*"],
     })
+
+    new cdk.CfnOutput(this, 'CloudFrontURL', { 
+      value: `https://${distribution.distributionDomainName}`, 
+    });
+
+    new cdk.CfnOutput(this, 'LambdaFunctionURL', { 
+      value: lambdaFunctionURL.url, 
+    });
+
+    new cdk.CfnOutput(this, 'PythonLambdaFunctionURL', { 
+      value: pythonLambdaFunctionURL.url, 
+    });
 
   }
 }
